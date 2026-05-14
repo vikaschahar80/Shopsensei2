@@ -11,7 +11,7 @@ import {
   type InsertOrder,
   type UserBehavior,
   type InsertUserBehavior
-} from "@shared/schema";
+} from "../shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {

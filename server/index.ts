@@ -38,29 +38,29 @@ app.use((req, res, next) => {
   next();
 });
 
-// Register routes
-registerRoutes(app).then((server) => {
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+// Initialize the app
+const server = registerRoutes(app);
 
-    res.status(status).json({ message });
-    throw err;
-  });
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
 
-  if (app.get("env") === "development") {
-    setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
-  if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
-    const port = parseInt(process.env.PORT || '5001', 10);
-    server.listen({
-      port,
-      host: "0.0.0.0",
-    }, () => {
-      log(`serving on port ${port}`);
-    });
-  }
+  res.status(status).json({ message });
+  throw err;
 });
+
+if (app.get("env") === "development") {
+  setupVite(app, server);
+} else {
+  serveStatic(app);
+}
+
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  const port = parseInt(process.env.PORT || '5001', 10);
+  server.listen({
+    port,
+    host: "0.0.0.0",
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+}

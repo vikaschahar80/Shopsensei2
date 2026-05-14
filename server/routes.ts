@@ -19,7 +19,7 @@ import {
   insertCartItemSchema, 
   insertOrderSchema,
   insertUserBehaviorSchema 
-} from "@shared/schema";
+} from "../shared/schema";
 import { z } from "zod";
 
 // Stripe configuration - replace with your actual keys
@@ -34,13 +34,18 @@ const stripe = STRIPE_SECRET_KEY && STRIPE_SECRET_KEY !== "" ? new Stripe(STRIPE
   apiVersion: "2025-07-30.basil",
 }) : null;
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export function registerRoutes(app: Express): Server {
   
   // Setup CORS
   app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true
   }));
+
+  // Health check route
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString(), env: process.env.NODE_ENV });
+  });
 
   // Setup Passport and Google OAuth
   app.use(passport.initialize());

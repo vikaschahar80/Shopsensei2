@@ -4,7 +4,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { storage } from './storage';
-import { users, type User } from '@shared/schema';
+import { users, type User } from '../shared/schema';
 
 // JWT Configuration
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';

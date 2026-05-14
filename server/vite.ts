@@ -68,23 +68,21 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
-  const alternateDistPath = path.resolve(import.meta.dirname, "..", "dist", "public");
   const rootDistPath = path.resolve(process.cwd(), "dist", "public");
+  const alternateDistPath = path.resolve(process.cwd(), "public");
   
   let finalDistPath = "";
-  if (fs.existsSync(distPath)) {
-    finalDistPath = distPath;
+  if (fs.existsSync(rootDistPath)) {
+    finalDistPath = rootDistPath;
   } else if (fs.existsSync(alternateDistPath)) {
     finalDistPath = alternateDistPath;
-  } else if (fs.existsSync(rootDistPath)) {
-    finalDistPath = rootDistPath;
   }
   
   if (!finalDistPath) {
     log(`Warning: Could not find build directory. Static files will not be served.`);
-    log(`Checked: ${distPath}, ${alternateDistPath}, ${rootDistPath}`);
-    return;
+    log(`Checked: ${rootDistPath}, ${alternateDistPath}`);
+    // Fallback to current dir if all else fails
+    finalDistPath = path.resolve(process.cwd());
   }
 
   log(`Serving static files from: ${finalDistPath}`);
