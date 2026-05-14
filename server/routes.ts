@@ -175,6 +175,25 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Recommendations and Popular products (Must be BEFORE :id routes)
+  app.get("/api/products/popular", async (req, res) => {
+    try {
+      const popularProducts = await storage.getPopularProducts();
+      res.json(popularProducts);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/recommendations/:userId", async (req, res) => {
+    try {
+      const recommendations = await storage.getRecommendedProducts(req.params.userId);
+      res.json(recommendations);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.get("/api/products/:id", async (req, res) => {
     try {
       const product = await storage.getProduct(req.params.id);
@@ -217,25 +236,6 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ message: "Product not found" });
       }
       res.json({ success: true });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Recommendations routes
-  app.get("/api/recommendations/:userId", async (req, res) => {
-    try {
-      const recommendations = await storage.getRecommendedProducts(req.params.userId);
-      res.json(recommendations);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.get("/api/products/popular", async (req, res) => {
-    try {
-      const popularProducts = await storage.getPopularProducts();
-      res.json(popularProducts);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
