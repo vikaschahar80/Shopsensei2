@@ -56,10 +56,19 @@ export function registerRoutes(app: Express): Server {
     try {
       const userData = insertUserSchema.parse(req.body);
       
+      // Normalize email and username
+      const email = userData.email.toLowerCase().trim();
+      const username = userData.username.toLowerCase().trim();
+      
       // Check if user already exists
-      const existingUser = await storage.getUserByEmail(userData.email);
-      if (existingUser) {
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
         return res.status(400).json({ message: "User with this email already exists" });
+      }
+
+      const existingUserByUsername = await storage.getUserByUsername(username);
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: "Username is already taken" });
       }
 
       // Hash password
@@ -67,7 +76,12 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ message: "Password is required" });
       }
       const hashedPassword = await hashPassword(userData.password);
-      const user = await storage.createUser({ ...userData, password: hashedPassword });
+      const user = await storage.createUser({ 
+        ...userData, 
+        email, 
+        username, 
+        password: hashedPassword 
+      });
       
       // Generate JWT token
       const token = generateToken(user.id, user.email, user.isAdmin || false);
@@ -82,7 +96,8 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await storage.getUserByEmail(email);
+      const normalizedEmail = email.toLowerCase().trim();
+      const user = await storage.getUserByEmail(normalizedEmail);
       
       if (!user || !user.password) {
         return res.status(401).json({ message: "Invalid credentials" });
