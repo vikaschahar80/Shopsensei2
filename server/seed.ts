@@ -3,6 +3,7 @@ import { db } from './db';
 import { users, categories, products } from '../shared/schema';
 import { MemStorage } from './storage';
 import bcrypt from 'bcryptjs';
+import { sql } from 'drizzle-orm';
 
 async function seed() {
   console.log("Starting database seeding...");
@@ -15,8 +16,14 @@ async function seed() {
   console.log(`Found ${memCategories.length} categories and ${memProducts.length} products to seed.`);
   
   try {
+    // Clear existing data in correct order (products first due to FK constraint)
+    console.log("Clearing existing data...");
+    await db.execute(sql`DELETE FROM products`);
+    await db.execute(sql`DELETE FROM categories`);
+    console.log("✅ Existing data cleared.");
+
     if (memCategories.length > 0) {
-      await db.insert(categories).values(memCategories).onConflictDoNothing();
+      await db.insert(categories).values(memCategories);
       console.log("✅ Categories seeded successfully.");
     }
     
@@ -37,7 +44,7 @@ async function seed() {
         isActive: p.isActive,
         createdAt: p.createdAt
       }));
-      await db.insert(products).values(productsToInsert).onConflictDoNothing();
+      await db.insert(products).values(productsToInsert);
       console.log("✅ Products seeded successfully.");
     }
     
