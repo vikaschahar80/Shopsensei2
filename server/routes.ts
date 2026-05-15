@@ -168,7 +168,8 @@ export function registerRoutes(app: Express): Server {
       const categories = await storage.getCategories();
       res.json(categories);
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      console.error('Categories error:', error.message);
+      res.json([]); // Return empty array instead of 500
     }
   });
 
@@ -186,7 +187,8 @@ export function registerRoutes(app: Express): Server {
       const products = await storage.getProducts(filters);
       res.json(products);
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      console.error('Products error:', error.message);
+      res.json([]); // Return empty array instead of 500
     }
   });
 
@@ -196,7 +198,8 @@ export function registerRoutes(app: Express): Server {
       const popularProducts = await storage.getPopularProducts();
       res.json(popularProducts);
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      console.error('Popular products error:', error.message);
+      res.json([]); // Return empty array instead of 500
     }
   });
 
@@ -205,7 +208,8 @@ export function registerRoutes(app: Express): Server {
       const recommendations = await storage.getRecommendedProducts(req.params.userId);
       res.json(recommendations);
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      console.error('Recommendations error:', error.message);
+      res.json([]); // Return empty array instead of 500
     }
   });
 

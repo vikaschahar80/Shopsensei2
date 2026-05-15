@@ -3,5 +3,10 @@ const { Pool } = pg;
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "../shared/schema";
 
-export const pool = process.env.DATABASE_URL ? new Pool({ connectionString: process.env.DATABASE_URL }) : null as any;
-export const db = process.env.DATABASE_URL ? drizzle({ client: pool, schema }) : null as any;
+const poolConfig = process.env.DATABASE_URL ? {
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+} : null;
+
+export const pool = poolConfig ? new Pool(poolConfig) : null as any;
+export const db = poolConfig ? drizzle({ client: pool, schema }) : null as any;
