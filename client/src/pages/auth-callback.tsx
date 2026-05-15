@@ -23,12 +23,13 @@ export const AuthCallbackPage: React.FC = () => {
 
       if (tokenParam && userParam) {
         try {
-          // The auth context will handle the token and user data
+          const userData = JSON.parse(decodeURIComponent(userParam));
+          // Store token and user in localStorage so auth context picks it up
+          localStorage.setItem('token', tokenParam);
+          localStorage.setItem('user', JSON.stringify(userData));
           setStatus('success');
-          // Redirect to home page after a short delay
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 2000);
+          // Redirect immediately to home
+          window.location.replace('/');
         } catch (error) {
           setError('Failed to process authentication');
           setStatus('error');
